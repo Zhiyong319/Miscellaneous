@@ -1,3 +1,5 @@
+### retrive the address info (street + city + state + country) from Latitude/Longitude
+
 rm(list = ls())
 
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
@@ -7,17 +9,11 @@ library(jsonlite)
 
 source('C:/Users/zwu/Programming/R/myRfunctions.R')
 
-# myfile <- '../AMET/PAIRED_MODEL_OBS/sites_PBLH.csv'
-# sites <- read.csv(myfile)
-# sites$state <- NA
-# sites$country <- NA 
-load('C:/Users/zwu/Programming/AMET/pblh.Rdata')
+sites <- read.csv('myfile.csv') # MUST include columns: Latitude and Longitude
+sites$state <- NA
+ites$country <- NA 
 
-# load('C:/Users/zwu/Programming/AMET/meteo.Rdata')
-
-# load('C:/Users/zwu/Programming/AMET/PM25.Rdata')
-
-API_Key <-"AIzaSyDQTtb7jaIlaykM1JfKmctFg8x-ncMw-GA" 
+API_Key <-"your_GOOGLE_API_key" 
 
 for (id in 1:nrow(sites)) {
 
@@ -49,33 +45,11 @@ for (id in 1:nrow(sites)) {
 }
 
 ### write data
-# write.csv(sites,file=myfile) # over-write the original file
+write.csv(sites,file=myfile) # over-write the original file
 
+### check the results. In some cases,  full state names are returned, not abbreviated
 state <- strsplit(sites$state," ")
 for (i in 1:length(state)) {
   sites$state[i] <- state[[i]][1]
 }
 sites$state <- state.name2abb(sites$state)
-
-# assign a Regional Planning Organizations (RGO) region
-VISTAS <- c('AL' , 'FL' , 'GA' , 'KY', 'MS', 'NC' , 'SC' , 'TN' , 'VA' , 'WV')
-CENRAP <- c('NE' , 'KS' , 'OK' , 'TX' , 'MN' , 'IA' , 'MO' , 'AR' , 'LA')
-MANE_VU<- c('CT' , 'DE' , 'DC' , 'ME' , 'MD' , 'MA' , 'NH' , 'NJ' , 'NY' , 'PA' , 'RI' , 'VT')
-LADCO  <- c('IL' , 'IN' , 'MI' , 'OH' , 'WI')
-WRAP   <- c('AK' , 'CA' , 'OR' , 'WA' , 'AZ' , 'NM' , 'CO' , 'UT' , 'WY' , 'SD' , 'ND' , 'MT' , 'ID' , 'NV')
-RPO <- list(VISTAS=VISTAS, CENRAP=CENRAP, MANE_VU=MANE_VU, LADCO=LADCO, WRAP=WRAP)
-
-sites$region <- NA
-sites$region[sites$state %in% VISTAS] <- "VISTAS"
-sites$region[sites$state %in% CENRAP] <- "CENRAP"
-sites$region[sites$state %in% MANE_VU] <- "MANE_VU"
-sites$region[sites$state %in% LADCO] <- "LADCO"
-sites$region[sites$state %in% WRAP] <- "WRAP"
-
-# 
-# save(sites, RPO, meteo_obs_model_paired, meteo_model, meteo_obs, file='C:/Users/zwu/Programming/AMET/meteo.Rdata')
-
-# save(sites, PM25_AQS, PM25_model, file='C:/Users/zwu/Programming/AMET/PM25.Rdata')
-
-save(sites, RPO, pblh_obs, pblh_model,pblh_obs_1d, pblh_model_1d, pblh_obs_daily, pblh_obs_daily_1d,pblh_model_daily,pblh_model_daily_1d,
-     file='C:/Users/zwu/Programming/AMET/PBLH.Rdata')
